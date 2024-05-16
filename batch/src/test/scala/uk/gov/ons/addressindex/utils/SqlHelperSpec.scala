@@ -276,18 +276,18 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       val expectedFirstRelations = Array(
         Map(
           "level" -> 1,
-          "siblings" -> Array(1).deep,
-          "parents" -> Array().deep
+          "siblings" -> Array(1),
+          "parents" -> Array()
         ),
         Map(
           "level" -> 2,
-          "siblings" -> Array(2, 3, 4).deep,
-          "parents" -> Array(1, 1, 1).deep
+          "siblings" -> Array(2, 3, 4),
+          "parents" -> Array(1, 1, 1)
         ),
         Map(
           "level" -> 3,
-          "siblings" -> Array(5, 6, 7, 8, 9).deep,
-          "parents" -> Array(2, 2, 2, 3, 3).deep
+          "siblings" -> Array(5, 6, 7, 8, 9),
+          "parents" -> Array(2, 2, 2, 3, 3)
         )
       )
 
@@ -387,18 +387,18 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       val expectedFirstRelations = Array(
         Map(
           "level" -> 1,
-          "siblings" -> Array(1).deep,
-          "parents" -> Array().deep
+          "siblings" -> Array(1),
+          "parents" -> Array()
         ),
         Map(
           "level" -> 2,
-          "siblings" -> Array(2, 3, 4).deep,
-          "parents" -> Array(1, 1, 1).deep
+          "siblings" -> Array(2, 3, 4),
+          "parents" -> Array(1, 1, 1)
         ),
         Map(
           "level" -> 3,
-          "siblings" -> Array(5, 6, 7, 8, 9).deep,
-          "parents" -> Array(2, 2, 2, 3, 3).deep
+          "siblings" -> Array(5, 6, 7, 8, 9),
+          "parents" -> Array(2, 2, 2, 3, 3)
         )
       )
 

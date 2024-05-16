@@ -16,7 +16,7 @@ object CensusClassificationHelper {
   def ABPToAddressType(classCode: String, councilTax: Boolean = true, nonDomesticRates: Boolean = false): String = classCode match {
     case "RD" | "RD02" | "RD03" | "RD04" | "RD06"  => "HH"
     case "RD08" => "HH"
-    case "RH" | "RH01" | "RD02" | "RD03" => "HH"
+    case "RH" | "RH01" | "RH02" | "RH03" => "HH"
     case "RD01" | "RD07" | "RD10" | "CH02"  if councilTax => "HH" // if council tax  7666VC
     case "RD01" | "RD07" | "RD10" | "CH02"  if !councilTax => "SPG" // if council tax  7666VC
     case "CH" | "CH01" | "CH01YH" if nonDomesticRates => "CE"    // if linked to Non-Domestic Rates 7666VN
@@ -29,7 +29,7 @@ object CensusClassificationHelper {
   def ABPToEstabType(classCode: String, councilTax: Boolean = true, nonDomesticRates: Boolean = false): String = classCode match {
     case "RD" | "RD02" | "RD03" | "RD04" | "RD06"  => "Household"
     case "RD08" => "Sheltered Accommodation"
-    case "RH" | "RH01" | "RD02" | "RD03"  => "Household"
+    case "RH" | "RH01" | "RH02" | "RH03"  => "Household"
     case "RD01" | "RD07" | "RD10" | "CH02"  if councilTax => "Household" // if council tax  7666VC
     case "RD01" | "RD10" if !councilTax => "Residential Caravaner"  // if not council tax
     case "RD07" if !councilTax => "Residential Boater" // if not council tax  7666VC

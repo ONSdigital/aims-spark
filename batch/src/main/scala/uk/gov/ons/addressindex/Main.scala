@@ -51,7 +51,7 @@ For usage see below:
 
   if (!opts.help()) {
     AddressIndexFileReader.validateFileNames()
-    postMapping(indexName, skinny = opts.skinny())
+    postMapping(skinny = opts.skinny())
     preLoad(indexName)
     saveHybridAddresses(historical = !opts.hybridNoHist(), skinny = opts.skinny())
     postLoad(indexName)
@@ -61,7 +61,7 @@ For usage see below:
   // uncomment for local test - start
   // val indexName = generateIndexName(historical = false, skinny = false)
   // val url = s"http://$nodes:$port/$indexName"
-  // postMapping(indexName, skinny = true)
+  // postMapping(skinny = true)
   // saveHybridAddresses(historical = true, skinny = true)
   // uncomment for local test - end
 
@@ -83,14 +83,14 @@ For usage see below:
     val paf = AddressIndexFileReader.readDeliveryPointCSV()
 
     if (skinny) {
-        ElasticSearchWriter.saveSkinnyHybridAddresses(s"$indexName", SqlHelper.aggregateHybridSkinnyIndex(paf, nag,historical))
+        ElasticSearchWriter.saveSkinnyHybridAddresses(s"$indexName", SqlHelper.aggregateHybridSkinnyIndex(paf, nag, historical))
     } else {
         ElasticSearchWriter.saveHybridAddresses(s"$indexName", SqlHelper.aggregateHybridIndex(paf, nag, historical))
     }
 
   }
 
-  private def postMapping(indexName: String, skinny: Boolean = false): Unit = {
+  private def postMapping(skinny: Boolean = false): Unit = {
     val response: HttpResponse[String] = Http(url)
       .put(
         if (skinny) {

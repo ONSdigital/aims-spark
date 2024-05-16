@@ -2,11 +2,8 @@ package uk.gov.ons.addressindex.utils
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
-import org.apache.spark.sql.types.{ArrayType, FloatType, LongType}
 import uk.gov.ons.addressindex.models.{HybridAddressEsDocument, HybridAddressSkinnyEsDocument}
 import uk.gov.ons.addressindex.readers.AddressIndexFileReader
-
-import scala.util.Try
 
 /**
   * Join the Csv files into single DataFrame
@@ -191,7 +188,7 @@ object SqlHelper {
   /**
     * Constructs a hybrid index from nag and paf dataframes
     */
-  def aggregateHybridSkinnyIndex(paf: DataFrame, nag: DataFrame, historical: Boolean = true, nisraAddress1YearAgo: Boolean = false): RDD[HybridAddressSkinnyEsDocument] = {
+  def aggregateHybridSkinnyIndex(paf: DataFrame, nag: DataFrame, historical: Boolean = true): RDD[HybridAddressSkinnyEsDocument] = {
 
     val rdmfGrouped =  aggregateRDMFInformation(AddressIndexFileReader.readRDMFCSV())
       .groupBy("uprn")
@@ -235,15 +232,9 @@ object SqlHelper {
         val lpis = Option(row.getAs[Seq[Row]]("lpis")).getOrElse(Seq())
         val parentUprn = Option(row.getAs[Long]("parentUprn"))
         val classifications = Option(row.getAs[Seq[Row]]("classification")).getOrElse(Seq())
-        val crossRefs = Option(row.getAs[Seq[Row]]("crossRefs")).getOrElse(Seq())
-        val outputCrossRefs = crossRefs.map(row => HybridAddressEsDocument.rowToCrossRef(row))
         val outputLpis = lpis.map(row => HybridAddressSkinnyEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressSkinnyEsDocument.rowToPaf(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
-        val addressType = Option(row.getAs[String]("addressType")).getOrElse("")
-        val estabType = Option(row.getAs[String]("estabType")).getOrElse("")
-        val isCouncilTax:Boolean = outputCrossRefs.mkString.contains("7666VC")
-        val isNonDomesticRate:Boolean = outputCrossRefs.mkString.contains("7666VN")
 
         val lpiPostCode: Option[String] = outputLpis.headOption.flatMap(_.get("postcodeLocator").map(_.toString))
         val pafPostCode: Option[String] = outputPaf.headOption.flatMap(_.get("postcode").map(_.toString))
@@ -361,16 +352,11 @@ object SqlHelper {
         val relatives = Option(row.getAs[Seq[Row]]("relatives")).getOrElse(Seq())
         val parentUprn = Option(row.getAs[Long]("parentUprn"))
         val classifications = Option(row.getAs[Seq[Row]]("classification")).getOrElse(Seq())
-        val addressType = Option(row.getAs[String]("addressType")).getOrElse("")
-        val estabType = Option(row.getAs[String]("estabType")).getOrElse("")
         val outputLpis = lpis.map(row => HybridAddressEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressEsDocument.rowToPaf(row))
         val outputCrossRefs = crossRefs.map(row => HybridAddressEsDocument.rowToCrossRef(row))
         val outputRelatives = relatives.map(row => HybridAddressEsDocument.rowToHierarchy(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
-
-        val isCouncilTax:Boolean = outputCrossRefs.mkString.contains("7666VC")
-        val isNonDomesticRate:Boolean = outputCrossRefs.mkString.contains("7666VN")
 
         val lpiPostCode: Option[String] = outputLpis.headOption.flatMap(_.get("postcodeLocator").map(_.toString))
         val pafPostCode: Option[String] = outputPaf.headOption.flatMap(_.get("postcode").map(_.toString))
