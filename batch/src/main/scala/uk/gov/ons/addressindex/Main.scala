@@ -59,10 +59,10 @@ For usage see below:
   // comment out for local test - end
 
   // uncomment for local test - start
-  // val indexName = generateIndexName(historical = false, skinny = false)
-  // val url = s"http://$nodes:$port/$indexName"
-  // postMapping(skinny = true)
-  // saveHybridAddresses(historical = true, skinny = true)
+// val indexName = generateIndexName(historical = false, skinny = false)
+// val url = s"http://$nodes:$port/$indexName"
+// postMapping(skinny = true)
+//   saveHybridAddresses(historical = true, skinny = true)
   // uncomment for local test - end
 
   private def generateIndexName(historical: Boolean = true, skinny: Boolean = false ): String =
