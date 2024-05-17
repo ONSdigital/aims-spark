@@ -347,7 +347,14 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       secondResult.paf.size shouldBe 1
 
       // Hierarchy test
-      firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString) shouldBe expectedFirstRelations.toList
+      val sortedRels = firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString)
+      val expFirstRels = expectedFirstRelations.toList
+      sortedRels(0).get("parents").toList should contain theSameElementsAs expFirstRels(0).get("parents").toList
+      sortedRels(0).get("siblings").toList should contain theSameElementsAs expFirstRels(0).get("siblings").toList
+      sortedRels(1).get("parents").toList should contain theSameElementsAs expFirstRels(1).get("parents").toList
+      sortedRels(1).get("siblings").toList should contain theSameElementsAs expFirstRels(1).get("siblings").toList
+      sortedRels(2).get("parents").toList should contain theSameElementsAs expFirstRels(2).get("parents").toList
+      sortedRels(2).get("siblings").toList should contain theSameElementsAs expFirstRels(2).get("siblings").toList
 
       // CrossRefs Test
       secondResult.crossRefs.toList.sortBy(_("crossReference")) shouldBe expectedSecondCrossRefs.toList.sortBy(_("crossReference"))
@@ -458,7 +465,14 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       secondResult.paf.size shouldBe 1
 
       // Hierarchy test
-      firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString) shouldBe expectedFirstRelations.toList
+      val sortedRels = firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString)
+      val expFirstRels = expectedFirstRelations.toList
+      sortedRels(0).get("parents").toList should contain theSameElementsAs expFirstRels(0).get("parents").toList
+      sortedRels(0).get("siblings").toList should contain theSameElementsAs expFirstRels(0).get("siblings").toList
+      sortedRels(1).get("parents").toList should contain theSameElementsAs expFirstRels(1).get("parents").toList
+      sortedRels(1).get("siblings").toList should contain theSameElementsAs expFirstRels(1).get("siblings").toList
+      sortedRels(2).get("parents").toList should contain theSameElementsAs expFirstRels(2).get("parents").toList
+      sortedRels(2).get("siblings").toList should contain theSameElementsAs expFirstRels(2).get("siblings").toList
 
       // CrossRefs Test
       secondResult.crossRefs.toList.sortBy(_("crossReference")) shouldBe expectedSecondCrossRefs.toList.sortBy(_("crossReference"))

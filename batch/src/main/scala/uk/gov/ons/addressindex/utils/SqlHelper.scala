@@ -228,10 +228,10 @@ object SqlHelper {
     pafNagHierGrouped.rdd.map {
       row =>
         val uprn = row.getAs[Long]("uprn")
-        val paf = Option(row.getAs[Seq[Row]]("paf")).getOrElse(Seq())
-        val lpis = Option(row.getAs[Seq[Row]]("lpis")).getOrElse(Seq())
+        val paf = Option(row.getAs[scala.collection.mutable.Seq[Row]]("paf")).getOrElse(Seq()).toSeq
+        val lpis = Option(row.getAs[scala.collection.mutable.Seq[Row]]("lpis")).getOrElse(Seq()).toSeq
         val parentUprn = Option(row.getAs[Long]("parentUprn"))
-        val classifications = Option(row.getAs[Seq[Row]]("classification")).getOrElse(Seq())
+        val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
         val outputLpis = lpis.map(row => HybridAddressSkinnyEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressSkinnyEsDocument.rowToPaf(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
@@ -281,7 +281,7 @@ object SqlHelper {
         val mixedPartialTokens = mixedPartial.flatMap(_.toString.split(",").filter(_.nonEmpty)).distinct.mkString(",")
         val mixedPartialTokensExtraDedup = mixedPartialTokens.replaceAll(","," ").split(" ").distinct.mkString(" ").replaceAll("  "," ")
 
-        val entryIds = Option(row.getAs[Seq[Row]]("entryids")).getOrElse(Seq())
+        val entryIds = Option(row.getAs[scala.collection.mutable.Seq[Row]]("entryids")).getOrElse(Seq()).toSeq
         val addressEntryId: Option[Long] = entryIds.map(row => row.getAs[Long]("address_entry_id")).headOption
         val addressEntryIdAlphanumericBackup: Option[String] = entryIds.map(row => row.getAs[String]("address_entry_id_alphanumeric_backup")).headOption
 
@@ -346,12 +346,12 @@ object SqlHelper {
     pafNagCrossHierGrouped.rdd.map {
       row =>
         val uprn = row.getAs[Long]("uprn")
-        val paf = Option(row.getAs[Seq[Row]]("paf")).getOrElse(Seq())
-        val lpis = Option(row.getAs[Seq[Row]]("lpis")).getOrElse(Seq())
-        val crossRefs = Option(row.getAs[Seq[Row]]("crossRefs")).getOrElse(Seq())
-        val relatives = Option(row.getAs[Seq[Row]]("relatives")).getOrElse(Seq())
+        val paf = Option(row.getAs[scala.collection.mutable.Seq[Row]]("paf")).getOrElse(Seq()).toSeq
+        val lpis = Option(row.getAs[scala.collection.mutable.Seq[Row]]("lpis")).getOrElse(Seq()).toSeq
+        val crossRefs = Option(row.getAs[scala.collection.mutable.Seq[Row]]("crossRefs")).getOrElse(Seq()).toSeq
+        val relatives = Option(row.getAs[scala.collection.mutable.Seq[Row]]("relatives")).getOrElse(Seq()).toSeq
         val parentUprn = Option(row.getAs[Long]("parentUprn"))
-        val classifications = Option(row.getAs[Seq[Row]]("classification")).getOrElse(Seq())
+        val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
         val outputLpis = lpis.map(row => HybridAddressEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressEsDocument.rowToPaf(row))
         val outputCrossRefs = crossRefs.map(row => HybridAddressEsDocument.rowToCrossRef(row))
@@ -408,7 +408,7 @@ object SqlHelper {
         val mixedPartialTokens = mixedPartial.flatMap(_.toString.split(",").filter(_.nonEmpty)).distinct.mkString(",")
         val mixedPartialTokensExtraDedup = mixedPartialTokens.replaceAll(","," ").split(" ").distinct.mkString(" ").replaceAll("  "," ")
 
-        val entryIds = Option(row.getAs[Seq[Row]]("entryids")).getOrElse(Seq())
+        val entryIds = Option(row.getAs[scala.collection.mutable.Seq[Row]]("entryids")).getOrElse(Seq()).toSeq
         val addressEntryId: Option[Long] = entryIds.map(row => row.getAs[Long]("address_entry_id")).headOption
         val addressEntryIdAlphanumericBackup: Option[String] = entryIds.map(row => row.getAs[String]("address_entry_id_alphanumeric_backup")).headOption
 
