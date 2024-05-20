@@ -2,11 +2,8 @@ package uk.gov.ons.addressindex.utils
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
-import org.apache.spark.sql.types.{ArrayType, FloatType, LongType}
 import uk.gov.ons.addressindex.models.{HybridAddressEsDocument, HybridAddressSkinnyEsDocument}
 import uk.gov.ons.addressindex.readers.AddressIndexFileReader
-
-import scala.util.Try
 
 /**
   * Join the Csv files into single DataFrame
@@ -191,7 +188,7 @@ object SqlHelper {
   /**
     * Constructs a hybrid index from nag and paf dataframes
     */
-  def aggregateHybridSkinnyIndex(paf: DataFrame, nag: DataFrame, historical: Boolean = true, nisraAddress1YearAgo: Boolean = false): RDD[HybridAddressSkinnyEsDocument] = {
+  def aggregateHybridSkinnyIndex(paf: DataFrame, nag: DataFrame, historical: Boolean = true): RDD[HybridAddressSkinnyEsDocument] = {
 
     val rdmfGrouped =  aggregateRDMFInformation(AddressIndexFileReader.readRDMFCSV())
       .groupBy("uprn")
@@ -231,19 +228,13 @@ object SqlHelper {
     pafNagHierGrouped.rdd.map {
       row =>
         val uprn = row.getAs[Long]("uprn")
-        val paf = Option(row.getAs[Seq[Row]]("paf")).getOrElse(Seq())
-        val lpis = Option(row.getAs[Seq[Row]]("lpis")).getOrElse(Seq())
+        val paf = Option(row.getAs[scala.collection.mutable.Seq[Row]]("paf")).getOrElse(Seq()).toSeq
+        val lpis = Option(row.getAs[scala.collection.mutable.Seq[Row]]("lpis")).getOrElse(Seq()).toSeq
         val parentUprn = Option(row.getAs[Long]("parentUprn"))
-        val classifications = Option(row.getAs[Seq[Row]]("classification")).getOrElse(Seq())
-        val crossRefs = Option(row.getAs[Seq[Row]]("crossRefs")).getOrElse(Seq())
-        val outputCrossRefs = crossRefs.map(row => HybridAddressEsDocument.rowToCrossRef(row))
+        val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
         val outputLpis = lpis.map(row => HybridAddressSkinnyEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressSkinnyEsDocument.rowToPaf(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
-        val addressType = Option(row.getAs[String]("addressType")).getOrElse("")
-        val estabType = Option(row.getAs[String]("estabType")).getOrElse("")
-        val isCouncilTax:Boolean = outputCrossRefs.mkString.contains("7666VC")
-        val isNonDomesticRate:Boolean = outputCrossRefs.mkString.contains("7666VN")
 
         val lpiPostCode: Option[String] = outputLpis.headOption.flatMap(_.get("postcodeLocator").map(_.toString))
         val pafPostCode: Option[String] = outputPaf.headOption.flatMap(_.get("postcode").map(_.toString))
@@ -290,7 +281,7 @@ object SqlHelper {
         val mixedPartialTokens = mixedPartial.flatMap(_.toString.split(",").filter(_.nonEmpty)).distinct.mkString(",")
         val mixedPartialTokensExtraDedup = mixedPartialTokens.replaceAll(","," ").split(" ").distinct.mkString(" ").replaceAll("  "," ")
 
-        val entryIds = Option(row.getAs[Seq[Row]]("entryids")).getOrElse(Seq())
+        val entryIds = Option(row.getAs[scala.collection.mutable.Seq[Row]]("entryids")).getOrElse(Seq()).toSeq
         val addressEntryId: Option[Long] = entryIds.map(row => row.getAs[Long]("address_entry_id")).headOption
         val addressEntryIdAlphanumericBackup: Option[String] = entryIds.map(row => row.getAs[String]("address_entry_id_alphanumeric_backup")).headOption
 
@@ -355,22 +346,17 @@ object SqlHelper {
     pafNagCrossHierGrouped.rdd.map {
       row =>
         val uprn = row.getAs[Long]("uprn")
-        val paf = Option(row.getAs[Seq[Row]]("paf")).getOrElse(Seq())
-        val lpis = Option(row.getAs[Seq[Row]]("lpis")).getOrElse(Seq())
-        val crossRefs = Option(row.getAs[Seq[Row]]("crossRefs")).getOrElse(Seq())
-        val relatives = Option(row.getAs[Seq[Row]]("relatives")).getOrElse(Seq())
+        val paf = Option(row.getAs[scala.collection.mutable.Seq[Row]]("paf")).getOrElse(Seq()).toSeq
+        val lpis = Option(row.getAs[scala.collection.mutable.Seq[Row]]("lpis")).getOrElse(Seq()).toSeq
+        val crossRefs = Option(row.getAs[scala.collection.mutable.Seq[Row]]("crossRefs")).getOrElse(Seq()).toSeq
+        val relatives = Option(row.getAs[scala.collection.mutable.Seq[Row]]("relatives")).getOrElse(Seq()).toSeq
         val parentUprn = Option(row.getAs[Long]("parentUprn"))
-        val classifications = Option(row.getAs[Seq[Row]]("classification")).getOrElse(Seq())
-        val addressType = Option(row.getAs[String]("addressType")).getOrElse("")
-        val estabType = Option(row.getAs[String]("estabType")).getOrElse("")
+        val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
         val outputLpis = lpis.map(row => HybridAddressEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressEsDocument.rowToPaf(row))
         val outputCrossRefs = crossRefs.map(row => HybridAddressEsDocument.rowToCrossRef(row))
         val outputRelatives = relatives.map(row => HybridAddressEsDocument.rowToHierarchy(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
-
-        val isCouncilTax:Boolean = outputCrossRefs.mkString.contains("7666VC")
-        val isNonDomesticRate:Boolean = outputCrossRefs.mkString.contains("7666VN")
 
         val lpiPostCode: Option[String] = outputLpis.headOption.flatMap(_.get("postcodeLocator").map(_.toString))
         val pafPostCode: Option[String] = outputPaf.headOption.flatMap(_.get("postcode").map(_.toString))
@@ -422,7 +408,7 @@ object SqlHelper {
         val mixedPartialTokens = mixedPartial.flatMap(_.toString.split(",").filter(_.nonEmpty)).distinct.mkString(",")
         val mixedPartialTokensExtraDedup = mixedPartialTokens.replaceAll(","," ").split(" ").distinct.mkString(" ").replaceAll("  "," ")
 
-        val entryIds = Option(row.getAs[Seq[Row]]("entryids")).getOrElse(Seq())
+        val entryIds = Option(row.getAs[scala.collection.mutable.Seq[Row]]("entryids")).getOrElse(Seq()).toSeq
         val addressEntryId: Option[Long] = entryIds.map(row => row.getAs[Long]("address_entry_id")).headOption
         val addressEntryIdAlphanumericBackup: Option[String] = entryIds.map(row => row.getAs[String]("address_entry_id_alphanumeric_backup")).headOption
 

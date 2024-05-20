@@ -12,7 +12,7 @@ import java.nio.charset.CodingErrorAction
 
 abstract class EsDocument {
 
-  implicit val codec = Codec("UTF-8")
+  implicit val codec: Codec = Codec("UTF-8")
   codec.onMalformedInput(CodingErrorAction.REPLACE)
   codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
 

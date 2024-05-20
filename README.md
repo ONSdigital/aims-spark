@@ -89,17 +89,22 @@ Other settings from the reference.conf can be overridden, e.g. for a cluster mod
 ```
 addressindex.spark.master="yarn"
 ```
+If set, this line should be commented out for running tests
 
 The job can also be run from inside IntelliJ. 
 In this case you can run the Main class directly but need to comment out lines 48-59 and uncomment the lines that follow:
 ```
 val indexName = generateIndexName(historical=true, skinny=true, nisra=true)
 val url = s"http://$nodes:$port/$indexName"
-postMapping(indexName, skinny=true)
+postMapping(skinny=true)
 saveHybridAddresses(historical=true, skinny=true)
 ```
 where the first boolean is for a historic index, second for a skinny index. Note that you can also hard-code the index name, and you also need to ensure
 that the variable `localTarget` is set to true in `build.sbt`
+
+You may have to add the following to the VM Options box in the run configuration
+--add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=java.base/sun.util.calendar=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED
+
 
 ## Running Tests
 
@@ -114,8 +119,10 @@ Before you can run tests on this project if using Windows you must
 
 Then next time you right-click the green arrow "Run ScalaTests" should be shown.
 
-Note that you can't run the tests using sbt on the command line.
+You may have to add the following to the VM Options box in the run configuration
+--add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=java.base/sun.util.calendar=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED
 
+You should also check your application.conf and reference.conf to make sure they are pointing to the local unit test files.
 ### Dependencies
 
 Top level project dependencies may be found in the build.sbt file.

@@ -276,18 +276,18 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       val expectedFirstRelations = Array(
         Map(
           "level" -> 1,
-          "siblings" -> Array(1).deep,
-          "parents" -> Array().deep
+          "siblings" -> Array(1),
+          "parents" -> Array()
         ),
         Map(
           "level" -> 2,
-          "siblings" -> Array(2, 3, 4).deep,
-          "parents" -> Array(1, 1, 1).deep
+          "siblings" -> Array(2, 3, 4),
+          "parents" -> Array(1, 1, 1)
         ),
         Map(
           "level" -> 3,
-          "siblings" -> Array(5, 6, 7, 8, 9).deep,
-          "parents" -> Array(2, 2, 2, 3, 3).deep
+          "siblings" -> Array(5, 6, 7, 8, 9),
+          "parents" -> Array(2, 2, 2, 3, 3)
         )
       )
 
@@ -347,7 +347,14 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       secondResult.paf.size shouldBe 1
 
       // Hierarchy test
-      firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString) shouldBe expectedFirstRelations.toList
+      val sortedRels = firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString)
+      val expFirstRels = expectedFirstRelations.toList
+      sortedRels(0).get("parents").toList should contain theSameElementsAs expFirstRels(0).get("parents").toList
+      sortedRels(0).get("siblings").toList should contain theSameElementsAs expFirstRels(0).get("siblings").toList
+      sortedRels(1).get("parents").toList should contain theSameElementsAs expFirstRels(1).get("parents").toList
+      sortedRels(1).get("siblings").toList should contain theSameElementsAs expFirstRels(1).get("siblings").toList
+      sortedRels(2).get("parents").toList should contain theSameElementsAs expFirstRels(2).get("parents").toList
+      sortedRels(2).get("siblings").toList should contain theSameElementsAs expFirstRels(2).get("siblings").toList
 
       // CrossRefs Test
       secondResult.crossRefs.toList.sortBy(_("crossReference")) shouldBe expectedSecondCrossRefs.toList.sortBy(_("crossReference"))
@@ -387,18 +394,18 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       val expectedFirstRelations = Array(
         Map(
           "level" -> 1,
-          "siblings" -> Array(1).deep,
-          "parents" -> Array().deep
+          "siblings" -> Array(1),
+          "parents" -> Array()
         ),
         Map(
           "level" -> 2,
-          "siblings" -> Array(2, 3, 4).deep,
-          "parents" -> Array(1, 1, 1).deep
+          "siblings" -> Array(2, 3, 4),
+          "parents" -> Array(1, 1, 1)
         ),
         Map(
           "level" -> 3,
-          "siblings" -> Array(5, 6, 7, 8, 9).deep,
-          "parents" -> Array(2, 2, 2, 3, 3).deep
+          "siblings" -> Array(5, 6, 7, 8, 9),
+          "parents" -> Array(2, 2, 2, 3, 3)
         )
       )
 
@@ -458,7 +465,14 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       secondResult.paf.size shouldBe 1
 
       // Hierarchy test
-      firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString) shouldBe expectedFirstRelations.toList
+      val sortedRels = firstResult.relatives.toList.sortBy(_.getOrElse("level", 0).toString)
+      val expFirstRels = expectedFirstRelations.toList
+      sortedRels(0).get("parents").toList should contain theSameElementsAs expFirstRels(0).get("parents").toList
+      sortedRels(0).get("siblings").toList should contain theSameElementsAs expFirstRels(0).get("siblings").toList
+      sortedRels(1).get("parents").toList should contain theSameElementsAs expFirstRels(1).get("parents").toList
+      sortedRels(1).get("siblings").toList should contain theSameElementsAs expFirstRels(1).get("siblings").toList
+      sortedRels(2).get("parents").toList should contain theSameElementsAs expFirstRels(2).get("parents").toList
+      sortedRels(2).get("siblings").toList should contain theSameElementsAs expFirstRels(2).get("siblings").toList
 
       // CrossRefs Test
       secondResult.crossRefs.toList.sortBy(_("crossReference")) shouldBe expectedSecondCrossRefs.toList.sortBy(_("crossReference"))
