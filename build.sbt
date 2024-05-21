@@ -1,7 +1,7 @@
 lazy val commonSettings = Seq(
   version := "0.0.1",
   organization := "uk.gov.ons",
-  scalaVersion := "2.13.13",
+  scalaVersion := "2.12.18",
   assembly / test := {}
 )
 
