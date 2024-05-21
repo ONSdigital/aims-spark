@@ -41,13 +41,13 @@ As for historical entries, these are currently limited to those that ship with t
 
 ### Software and Versions
 
-* Java 11 
-* SBT 1.5.5 
-* Scala 2.12.14
-* Apache Spark 3.1.2
+* Java 17 
+* SBT 1.9.9 
+* Scala 2.12.18
+* Apache Spark 3.5.0
 * Elasticsearch 7.17.1
-* Elasticsearch-spark-30 7.12.0
-* Versions compatible with Google Dataproc v2.0
+* Elasticsearch-spark-30 8.13.4
+* Versions compatible with Google Dataproc v2.2
 
 ### Development Setup (IntelliJ)
 
