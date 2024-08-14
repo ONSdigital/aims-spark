@@ -1,7 +1,8 @@
 lazy val commonSettings = Seq(
   version := "0.0.1",
   organization := "uk.gov.ons",
-  scalaVersion := "2.12.18",
+  scalaVersion := "2.13.14",
+  // use 2.13.14 for serverless, 2.12.18 for servered Dataproc
   assembly / test := {}
 )
 
