@@ -356,7 +356,7 @@ object Mappings {
                           "name": "possessive_english"
                       },
                       "edge_ngram": {
-                          "type": "edgeNGram",
+                          "type": "edge_ngram",
                           "min_gram": "1",
                           "max_gram": "25",
                           "token_chars": ["letter", "digit"]
@@ -1269,7 +1269,7 @@ object Mappings {
                           "name": "possessive_english"
                       },
                       "edge_ngram": {
-                          "type": "edgeNGram",
+                          "type": "edge_ngram",
                           "min_gram": "1",
                           "max_gram": "25",
                           "token_chars": ["letter",
