@@ -43,18 +43,18 @@ As for historical entries, these are currently limited to those that ship with t
 
 * Java 17 
 * SBT 1.9.9 
-* Scala 2.12.18
-* Apache Spark 3.5.0
-* Elasticsearch 7.17.1
-* Elasticsearch-spark-30 8.13.4
-* Versions compatible with Google Dataproc v2.2
+* Scala 2.13.14
+* Apache Spark 3.5.1
+* Elasticsearch 8.14.3
+* Elasticsearch-spark-30 8.14.2
+* Versions compatible with Google Dataproc Serverless v2.2
 
 ### Development Setup (IntelliJ)
 
 * File, New, Project From Version Control, GitHub
-* Git Repository URL - select https://github.com/ONSdigital/address-index-data
+* Git Repository URL - select https://github.com/ONSdigital/aims-spark
 * Parent Directory: any local drive, typically your IdeaProjects directory
-* Directory Name: address-index-data
+* Directory Name: aims-spark
 * Clone
 
 ### Running
