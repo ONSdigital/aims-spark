@@ -22,16 +22,16 @@ object Main extends App {
       """
 Hybrid indexer. All options are mutually exclusive.
 
-Example: java -jar ons-ai-batch.jar --mapping --hybrid
+Example: java -jar ons-ai-batch.jar --skinny --hybridNoHist
 
 For usage see below:
   """)
 
-    val hybrid: ScallopOption[Boolean] = opt("hybrid", noshort = true, descr = "Index hybrid PAF & NAG including historical data")
     val hybridNoHist: ScallopOption[Boolean] = opt("hybridNoHist", noshort = true, descr = "Index hybrid PAF & NAG no historical data")
-    val mapping: ScallopOption[Boolean] = opt("mapping", noshort = true, descr = "Creates mapping for the index")
     val help: ScallopOption[Boolean] = opt("help", noshort = true, descr = "Show this message")
     val skinny: ScallopOption[Boolean] = opt("skinny", noshort = true, descr = "Create a skinny index")
+    val replicas: ScallopOption[Boolean] = opt("replicas", noshort = true, descr = "Create replicas for shards")
+    val custCodes: ScallopOption[String] = opt("custCodes", descr = "code1, code2, code3", required = false)
    verify()
   }
 
@@ -53,8 +53,8 @@ For usage see below:
     AddressIndexFileReader.validateFileNames()
     postMapping(skinny = opts.skinny())
     preLoad(indexName)
-    saveHybridAddresses(historical = !opts.hybridNoHist(), skinny = opts.skinny())
-    postLoad(indexName)
+    saveHybridAddresses(historical = !opts.hybridNoHist(), skinny = opts.skinny(), custcodes = opts.custCodes())
+    if (opts.replicas()) postLoad(indexName)
   } else opts.printHelp()
   // comment out for local test - end
 
@@ -65,21 +65,21 @@ For usage see below:
 //   saveHybridAddresses(historical = true, skinny = true)
   // uncomment for local test - end
 
-  private def generateIndexName(historical: Boolean = true, skinny: Boolean = false ): String =
+  private def generateIndexName(historical: Boolean = true, skinny: Boolean = false): String =
     AddressIndexFileReader.generateIndexNameFromFileName(historical, skinny)
 
-  private def generateNagAddresses(historical: Boolean = true, skinny: Boolean = false): DataFrame = {
+  private def generateNagAddresses(historical: Boolean = true, skinny: Boolean = false, custcodes: String = ""): DataFrame = {
     val blpu = AddressIndexFileReader.readBlpuCSV()
     val classification = AddressIndexFileReader.readClassificationCSV()
     val lpi = AddressIndexFileReader.readLpiCSV()
     val organisation = AddressIndexFileReader.readOrganisationCSV()
     val street = AddressIndexFileReader.readStreetCSV()
     val streetDescriptor = AddressIndexFileReader.readStreetDescriptorCSV()
-    SqlHelper.joinCsvs(blpu, classification, lpi, organisation, street, streetDescriptor, historical, skinny)
+    SqlHelper.joinCsvs(blpu, classification, lpi, organisation, street, streetDescriptor, historical, skinny, custcodes)
   }
 
-  private def saveHybridAddresses(historical: Boolean = true, skinny: Boolean = false): Unit = {
-    val nag = generateNagAddresses(historical, skinny)
+  private def saveHybridAddresses(historical: Boolean = true, skinny: Boolean = false, custcodes: String = "" ): Unit = {
+    val nag = generateNagAddresses(historical, skinny, custcodes)
     val paf = AddressIndexFileReader.readDeliveryPointCSV()
 
     if (skinny) {

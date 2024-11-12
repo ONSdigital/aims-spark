@@ -11,36 +11,72 @@ import uk.gov.ons.addressindex.readers.AddressIndexFileReader
 object SqlHelper {
 
   def joinCsvs(blpu: DataFrame, classification: DataFrame, lpi: DataFrame, organisation: DataFrame, street: DataFrame,
-               streetDescriptor: DataFrame, historical: Boolean = true, skinny: Boolean = false): DataFrame = {
-
+               streetDescriptor: DataFrame, historical: Boolean = true, skinny: Boolean = false, custcodes: String = ""): DataFrame = {
     val classificationTable = SparkProvider.registerTempTable(classification, "classification")
-    val blpuTable =
-      if (historical) {
-        val blpuWithHistory = SparkProvider.registerTempTable(blpu, "blpuWithHistory")
-        val blpuWithHistoryDF =
-          if (skinny)
-            SparkProvider.sparkContext.sql(s"""SELECT b.*, c.classificationCode
-              FROM $blpuWithHistory b
+    val blpuTable = {
+      if (custcodes == "") {
+        if (historical) {
+          val blpuWithHistory = SparkProvider.registerTempTable(blpu, "blpuWithHistory")
+          val blpuWithHistoryDF =
+            if (skinny)
+              SparkProvider.sparkContext.sql(
+                s"""SELECT b.*, c.classificationCode
+                FROM $blpuWithHistory b
                    LEFT JOIN $classificationTable c ON b.uprn = c.uprn
-              WHERE NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
-          else
-            SparkProvider.sparkContext.sql(s"""SELECT b.* FROM $blpuWithHistory b""")
-        SparkProvider.registerTempTable(blpuWithHistoryDF, "blpu")
-      } else {
-        val blpuNoHistory = SparkProvider.registerTempTable(blpu, "blpuNoHistory")
-        val blpuNoHistoryDF =
-          if (skinny)
-            SparkProvider.sparkContext.sql(s"""SELECT b.*, c.classificationCode
-              FROM $blpuNoHistory b
+                WHERE NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+            else
+              SparkProvider.sparkContext.sql(s"""SELECT b.* FROM $blpuWithHistory b """)
+          SparkProvider.registerTempTable(blpuWithHistoryDF, "blpu")
+        } else {
+          val blpuNoHistory = SparkProvider.registerTempTable(blpu, "blpuNoHistory")
+          val blpuNoHistoryDF =
+            if (skinny)
+              SparkProvider.sparkContext.sql(
+                s"""SELECT b.*, c.classificationCode
+                FROM $blpuNoHistory b
                    LEFT JOIN $classificationTable c ON b.uprn = c.uprn
-              WHERE b.logicalStatus != 8 AND c.classificationCode !='DUMMY' AND NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
-          else
-            SparkProvider.sparkContext.sql(s"""SELECT b.*, c.classificationCode
-              FROM $blpuNoHistory b
+                WHERE b.logicalStatus != 8 AND c.classificationCode !='DUMMY' AND NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+            else
+              SparkProvider.sparkContext.sql(
+                s"""SELECT b.*, c.classificationCode
+                FROM $blpuNoHistory b
                    LEFT OUTER JOIN $classificationTable c ON b.uprn = c.uprn
               WHERE b.logicalStatus != 8 AND c.classificationCode !='DUMMY' """)
-        SparkProvider.registerTempTable(blpuNoHistoryDF, "blpu")
+          SparkProvider.registerTempTable(blpuNoHistoryDF, "blpu")
+        }
+      } else {
+        if (historical) {
+          val blpuWithHistory = SparkProvider.registerTempTable(blpu, "blpuWithHistory")
+          val blpuWithHistoryDF =
+            if (skinny)
+              SparkProvider.sparkContext.sql(
+                s"""SELECT b.*, c.classificationCode
+                FROM $blpuWithHistory b
+                   LEFT JOIN $classificationTable c ON b.uprn = c.uprn
+                WHERE b.localCustodianCode IN ($custcodes) AND NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+            else {
+              SparkProvider.sparkContext.sql(s"""SELECT b.* FROM $blpuWithHistory b WHERE b.localCustodianCode IN ($custcodes)""")
+            }
+          SparkProvider.registerTempTable(blpuWithHistoryDF, "blpu")
+        } else {
+          val blpuNoHistory = SparkProvider.registerTempTable(blpu, "blpuNoHistory")
+          val blpuNoHistoryDF =
+            if (skinny)
+              SparkProvider.sparkContext.sql(
+                s"""SELECT b.*, c.classificationCode
+                FROM $blpuNoHistory b
+                   LEFT JOIN $classificationTable c ON b.uprn = c.uprn
+                WHERE b.localCustodianCode IN ($custcodes) AND b.logicalStatus != 8 AND c.classificationCode !='DUMMY' AND NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+            else
+              SparkProvider.sparkContext.sql(
+                s"""SELECT b.*, c.classificationCode
+                FROM $blpuNoHistory b
+                   LEFT OUTER JOIN $classificationTable c ON b.uprn = c.uprn
+                WHERE b.localCustodianCode IN ($custcodes) AND b.logicalStatus != 8 AND c.classificationCode !='DUMMY' """)
+          SparkProvider.registerTempTable(blpuNoHistoryDF, "blpu")
+        }
       }
+    }
     val organisationTable = SparkProvider.registerTempTable(organisation, "organisation")
     val lpiTable =
       if (historical) {
