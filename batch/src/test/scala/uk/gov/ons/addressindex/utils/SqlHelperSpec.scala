@@ -70,6 +70,37 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       firstLine.getDate(36) shouldBe new java.sql.Date(format.parse("2018-01-11").getTime) // LPI LAST UPDATE DATE
     }
 
+    "join blpu, organisation, lpi, street, street_descriptor and cross_ref with localCustCode filter" in {
+
+      // Given
+      val blpu = AddressIndexFileReader.readBlpuCSV()
+      val classification = AddressIndexFileReader.readClassificationCSV()
+      val lpi = AddressIndexFileReader.readLpiCSV()
+      val organisation = AddressIndexFileReader.readOrganisationCSV()
+      val street = AddressIndexFileReader.readStreetCSV()
+      val streetDescriptor = AddressIndexFileReader.readStreetDescriptorCSV()
+      val custCodes = "4219,4220"
+      // When
+      val result = SqlHelper.joinCsvs(blpu, classification, lpi, organisation, street, streetDescriptor,true,false,custCodes).sort("uprn").collect()
+
+      // Then
+      result.length shouldBe 5
+
+      val firstLine = result(0)
+
+      // check that the returned addresses have the correct local custodian code
+      firstLine.getLong(0) shouldBe 98L // UPRN
+      firstLine.getString(1) shouldBe "KL3 7GQ" // POSTCODE_LOCATOR
+      firstLine.getShort(9) shouldBe 4219 // LOCAL_CUSTODIAN_CODE
+
+      val secondLine = result(4)
+
+      secondLine.getLong(0) shouldBe 99L // UPRN
+      secondLine.getString(1) shouldBe "PO14 7GQ" // POSTCODE_LOCATOR
+      secondLine.getShort(9) shouldBe 4220 // LOCAL_CUSTODIAN_CODE
+
+    }
+
     "join blpu, organisation, lpi, street, street_descriptor and cross_ref without historical data" in {
 
       // Given
