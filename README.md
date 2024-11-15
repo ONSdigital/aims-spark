@@ -39,6 +39,19 @@ The skinny index was developed to speed up the typeahead function for the 2021 C
 
 As for historical entries, these are currently limited to those that ship with the latest Epoch. Our RDMF system has the ability to act as a "time machine" back to Epoch 39, but this is not currently implemented in AIMS.
 
+### Indices for Specific LA(s)
+
+The job can also be run to create indices for specific Local Authorities.
+This is achieved using a runtime parameter called custCodes which requires a comma-separated list of Local Authority custodian codes.
+for example:
+
+         --custCodes=1720,1725
+
+is Fareham and Gosport - list of codes here https://github.com/ONSdigital/aims-api/blob/main/parsers/src/main/resources/codelists/custodianList
+
+The resultant indices are thus much smaller depending on the number of custodians selected and should be usable on a laptop.
+However it is doing a WHERE clause on the full input data so the job to create them still needs to be run on a server or cloud service of some kind, such as Serverless Dataproc on Google Cloud Platform.
+
 ### Software and Versions
 
 * Java 17 
