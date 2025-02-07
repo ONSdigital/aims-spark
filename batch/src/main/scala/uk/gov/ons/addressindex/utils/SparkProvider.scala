@@ -49,7 +49,7 @@ object SparkProvider {
 
   conf.set("spark.hadoop.google.cloud.auth.service.account.json.keyfile", "C:\\Users\\user\\AppData\\Roaming\\gcloud\\application_default_credentials.json")
 
-  conf.set("spark.sql.repl.eagerEval.enabled", "true")
+ // conf.set("spark.sql.repl.eagerEval.enabled", "true")
 
   //conf.set("spark.hadoop.fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
   conf.set("fs.gs.impl", classOf[com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem].getName)

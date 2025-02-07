@@ -59,7 +59,7 @@ For usage see below:
   // comment out for local test - end
 
   // uncomment for local test - start
- val indexName = "bigtest4"
+ val indexName = "bigtest5"
  val url = s"http://$nodes:$port/$indexName"
  postMapping(skinny = false)
    saveHybridAddresses(historical = true, skinny = false, custcodes="1720,1725")
