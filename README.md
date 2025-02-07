@@ -22,13 +22,13 @@ We run a <a href="dbscripts/hierarchy_script.sql">script</a> against the updated
 
 The spark job will run without a real Hierarchy table (the dummy one in the unit tests will suffice) but the "relatives" information will be blank on every document. This won't affect the automated matching process, rather the structure of hierarchical addresses helps with clerical resolution.
 
-The SQL used by ONS to create the Hierarchy table is here: <a href="dbscripts/hierarchy_script.sql">hierarchy_script.sql</a> but note that not all the input fields are present in the standard ABP data: The address_entry_id and valid from / to dates are from RDMF.
+Note that the SQL used by ONS to create the Hierarchy table (link above) runs inside our RDMF system and not all the input fields are present in the standard ABP data: The address_entry_id and valid from / to dates are from RDMF.
 
 The job also has some additional input for the IDS service. This is a lookup between UPRN and AddressEntryId, the link key used internally with IDS and RDMF.
 
 Again the dummy file will suffice to allow the job to complete, with the AddressEntryId field left blank on all records.
 
-Note that earlier versions of the spark job had an option to include data from NISRA, but ONS now uses AddressBase Islands for full UK coverage.
+Note that earlier versions of the spark job had an option to include data from NISRA, but ONS now uses AddressBase Islands for full UK coverage. For a while the Islands data came as separate files, but this is no longer the case.
 
 The full indices are around 70GB in size and the skinny ones 40GB.
 
@@ -37,7 +37,7 @@ The full indices are around 70GB in size and the skinny ones 40GB.
 There are four different indices that can be output:
 Full historic, Full non-historic, Skinny historic and Skinny non-historic, controlled by two input parameters to the Spark job (--skinny and --hybridNoHist).
 
-The skinny index was developed to speed up the typeahead function for the 2021 Census. Bulk matching is always done using the full data.
+The skinny index was developed to speed up the typeahead function for the 2021 Census. As well as having fewer fields, it also excludes address types that are not residential, commercial or educational. Bulk matching is always done using the full data.
 
 As for historical entries, these are currently limited to those that ship with the latest Epoch. Our RDMF system has the ability to act as a "time machine" back to Epoch 39, but this is not currently implemented in AIMS.
 
