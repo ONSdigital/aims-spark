@@ -4,7 +4,7 @@ resolvers ++= Seq(
   "conjars" at "https://conjars.org/repo"
 )
 
-val localTarget: Boolean = false
+val localTarget: Boolean = true
 // set to true when testing locally (or to build a fat jar)
 // false for deployment to Cloudera with a thin jar
 // reload all sbt projects to clear ivy cache
@@ -12,7 +12,8 @@ val localTarget: Boolean = false
 val localDeps = Seq(
   "org.apache.spark" %% "spark-core" % "3.5.1",
   "org.apache.spark" %% "spark-sql" % "3.5.1",
-  "org.apache.spark" %% "spark-hive" % "3.5.1"
+  "org.apache.spark" %% "spark-hive" % "3.5.1",
+  "com.google.cloud.bigdataoss" % "gcs-connector" % "hadoop3-2.2.26"
 )
 
 val clouderaDeps = Seq(

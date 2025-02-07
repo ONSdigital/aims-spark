@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem
 
 /**
   * Provide global access to the spark context instance.
@@ -43,6 +44,15 @@ object SparkProvider {
 
   // this must fix duplication problem, hardcoded
   conf.set("es.mapping.id", "uprn")
+
+  //conf.set("spark.jars", "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar")
+
+  conf.set("spark.hadoop.google.cloud.auth.service.account.json.keyfile", "C:\\Users\\user\\AppData\\Roaming\\gcloud\\application_default_credentials.json")
+
+  conf.set("spark.sql.repl.eagerEval.enabled", "true")
+
+  //conf.set("spark.hadoop.fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
+  conf.set("fs.gs.impl", classOf[com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem].getName)
 
   // can also set .master here but should be in conf
    lazy val sparkContext: SparkSession = SparkSession.builder()

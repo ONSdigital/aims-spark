@@ -1,4 +1,4 @@
-# address-index-data 
+# aims-spark
 
 [![Build Status](https://travis-ci.com/ONSdigital/address-index-data.svg?token=wrHpQMWmwL6kpsdmycnz&branch=develop)](https://travis-ci.com/ONSdigital/address-index-data)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/83c0fb7ca2e64567b0998848ca781a36)](https://www.codacy.com/app/Valtech-ONS/address-index-data?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ONSdigital/address-index-data&amp;utm_campaign=Badge_Grade)
@@ -118,13 +118,63 @@ that the variable `localTarget` is set to true in `build.sbt`
 You may have to add the following to the VM Options box in the run configuration
 --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=java.base/sun.util.calendar=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED
 
+## Running on Google Dataproc
+
+The job can be run on serverless Dataproc by creating a batch similar to the example one below:
+```yaml
+  {
+    "sparkBatch": {
+      "jarFileUris": [
+        "gs://aims-dataproc-analysis-bucket/ons-ai-batch-assembly-e111-var.jar"
+      ],
+      "args": [
+        "--custCodes=1720,1725"
+      ],
+      "mainClass": "uk.gov.ons.addressindex.Main"
+    },
+    "labels": {
+      "goog-dataproc-batch-id": "e111vartest",
+      "goog-dataproc-batch-uuid": "67d4ed38-868f-4abe-aa55-573071df4c71",
+      "goog-dataproc-location": "europe-west2"
+    },
+    "runtimeConfig": {
+      "version": "2.2",
+      "properties": {
+        "spark.dataproc.driver.compute.tier": "premium",
+        "spark.dataproc.executor.compute.tier": "premium",
+        "spark.dataproc.driver.disk.tier": "premium",
+        "spark.dataproc.executor.disk.tier": "premium",
+        "spark.executor.instances": "2",
+        "spark.driver.cores": "8",
+        "spark.driver.memory": "24400m",
+        "spark.executor.cores": "8",
+        "spark.executor.memory": "12200m",
+        "spark.dynamicAllocation.executorAllocationRatio": "0.3",
+        "spark.app.name": "projects/ons-aims-analysis-prod/locations/europe-west2/batches/epochtest1",
+        "spark.dataproc.scaling.version": "2",
+        "spark.dataproc.driver.disk.size": "750g",
+        "spark.dataproc.executor.disk.size": "750g"
+      }
+    },
+    "name": "projects/ons-aims-analysis-prod/locations/europe-west2/batches/e111vartest",
+    "environmentConfig": {
+      "executionConfig": {
+        "serviceAccount": "dataproc-create@ons-aims-analysis-prod.iam.gserviceaccount.com",
+        "subnetworkUri": "sbn-es-ai-fat-bulk-2",
+        "networkTags": [
+          "census-bulk-2-es-cluster-fat"
+        ]
+      }
+    }
+  }
+```
 
 ## Running Tests
 
 Before you can run tests on this project if using Windows you must
   
-  * Install the 64-bit version of winutils.exe https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/winutils.exe
-  * save it on your local system in a bin directory e.g. c:\hadoop\bin
+  * Install the 64-bit version of winutils.exe https://github.com/kontext-tech/winutils/tree/master/hadoop-3.3.1/bin
+  * save it along with hadoop.dll on your local system in a bin directory e.g. c:\hadoop\bin
   * create environment variables ```HADOOP_HOME = c:\hadoop and hadoop.home.dir = c:\hadoop\bin```
   * Update Path to add ```%HADOOP_HOME%\bin```
   * Make temp directory writeable, on command line: ```winutils chmod 777 C:\tmp\hive``` (or other location of hive directory)

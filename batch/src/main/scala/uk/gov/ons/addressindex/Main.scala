@@ -46,23 +46,23 @@ For usage see below:
 
   //  each run of this application has a unique index name
   // comment out for local test - start
-  val indexName = generateIndexName(historical = !opts.hybridNoHist(), skinny = opts.skinny())
-  val url = s"http://$nodes:$port/$indexName"
-
-  if (!opts.help()) {
-    AddressIndexFileReader.validateFileNames()
-    postMapping(skinny = opts.skinny())
-    preLoad(indexName)
-    saveHybridAddresses(historical = !opts.hybridNoHist(), skinny = opts.skinny(), custcodes = opts.custCodes())
-    if (opts.replicas()) postLoad(indexName)
-  } else opts.printHelp()
+//  val indexName = generateIndexName(historical = !opts.hybridNoHist(), skinny = opts.skinny())
+//  val url = s"http://$nodes:$port/$indexName"
+//
+//  if (!opts.help()) {
+//    AddressIndexFileReader.validateFileNames()
+//    postMapping(skinny = opts.skinny())
+//    preLoad(indexName)
+//    saveHybridAddresses(historical = !opts.hybridNoHist(), skinny = opts.skinny(), custcodes = opts.custCodes())
+//    if (opts.replicas()) postLoad(indexName)
+//  } else opts.printHelp()
   // comment out for local test - end
 
   // uncomment for local test - start
-// val indexName = generateIndexName(historical = false, skinny = false)
-// val url = s"http://$nodes:$port/$indexName"
-// postMapping(skinny = true)
-//   saveHybridAddresses(historical = true, skinny = true)
+ val indexName = "bigtest4"
+ val url = s"http://$nodes:$port/$indexName"
+ postMapping(skinny = false)
+   saveHybridAddresses(historical = true, skinny = false, custcodes="1720,1725")
   // uncomment for local test - end
 
   private def generateIndexName(historical: Boolean = true, skinny: Boolean = false): String =
