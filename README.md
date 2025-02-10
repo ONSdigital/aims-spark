@@ -139,7 +139,7 @@ The job can be run on serverless Dataproc by creating a batch similar to the exa
   {
   "sparkBatch": {
     "jarFileUris": [
-      "gs://aims-dataproc-working-bucket/ons-ai-batch-assembly-e111.jar"
+      "gs://my-bucket/ons-ai-batch-assembly-1720-1725.jar"
     ],
     "args": [
       "--custCodes=1720,1725"
@@ -162,19 +162,19 @@ The job can be run on serverless Dataproc by creating a batch similar to the exa
       "spark.executor.cores": "8",
       "spark.executor.memory": "12200m",
       "spark.dynamicAllocation.executorAllocationRatio": "0.3",
-      "spark.app.name": "projects/ons-aims-test/locations/europe-west2/batches/twolas",
+      "spark.app.name": "projects/my-project/locations/europe-west2/batches/twolas",
       "spark.dataproc.scaling.version": "2",
       "spark.dataproc.driver.disk.size": "750g",
       "spark.dataproc.executor.disk.size": "750g"
     }
   },
-  "name": "projects/ons-aims-test/locations/europe-west2/batches/twolas",
+  "name": "projects/my-project/locations/europe-west2/batches/twolas",
   "environmentConfig": {
     "executionConfig": {
-      "serviceAccount": "dataproc-create@ons-aims-test.iam.gserviceaccount.com",
-      "subnetworkUri": "sbn-es-ai-fat-2",
+      "serviceAccount": "dataproc-create@my-project.iam.gserviceaccount.com",
+      "subnetworkUri": "my-subnetwork",
       "networkTags": [
-        "ons-es-cluster-fat"
+        "my-network"
       ]
     }
   }
