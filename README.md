@@ -22,13 +22,13 @@ We run a <a href="dbscripts/hierarchy_script.sql">script</a> against the updated
 
 The spark job will run without a real Hierarchy table (the dummy one in the unit tests will suffice) but the "relatives" information will be blank on every document. This won't affect the automated matching process, rather the structure of hierarchical addresses helps with clerical resolution.
 
-Note that the SQL used by ONS to create the Hierarchy table (link above) runs inside our RDMF system and not all the input fields are present in the standard ABP data: The address_entry_id and valid from / to dates are from RDMF.
+Note that the SQL used by ONS to create the Hierarchy table (link above) runs inside our Reference Data Management Framework (RDMF) system and not all the input fields are present in the standard ABP data: The address_entry_id and valid from / to dates are from the RDMF.
 
-The job also has some additional input for the IDS service. This is a lookup between UPRN and AddressEntryId, the link key used internally with IDS and RDMF.
+The job also has some additional input for the Integrated Data Service (IDS). This is a lookup between UPRN and AddressEntryId, the link key used internally with IDS and RDMF.
 
 Again the dummy file will suffice to allow the job to complete, with the AddressEntryId field left blank on all records.
 
-Note that earlier versions of the spark job had an option to include data from NISRA, but ONS now uses AddressBase Islands for full UK coverage. For a while the Islands data came as separate files, but this is no longer the case.
+Note that the islands flag is set to true if the islands data is supplied via separate CSV files, false if the islands data has been amalgamated or if it is not present.
 
 The full indices are around 70GB in size and the skinny ones 40GB.
 
