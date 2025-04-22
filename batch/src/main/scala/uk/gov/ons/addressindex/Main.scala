@@ -53,7 +53,7 @@ For usage see below:
     AddressIndexFileReader.validateFileNames()
     postMapping(skinny = opts.skinny())
     preLoad(indexName)
-    saveHybridAddresses(historical = !opts.hybridNoHist(), skinny = opts.skinny(), custcodes = opts.custCodes())
+    saveHybridAddresses(historical = !opts.hybridNoHist(), skinny = opts.skinny(), custcodes = opts.custCodes.getOrElse(""))
     if (opts.replicas()) postLoad(indexName)
   } else opts.printHelp()
   // comment out for local test - end
