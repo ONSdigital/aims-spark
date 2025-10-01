@@ -338,10 +338,22 @@ class AddressIndexFileReaderSpec extends AnyWordSpec with Matchers {
       }
     }
 
-    "extract date from the file path" in {
+    "extract date from ONS file path" in {
       // Given
       val filePath = "gs://aims-ons-abp-raw-full-e102-1037392368223_backup/ai_aims_delivery_point_current_20230913.csv"
       val expected = "20230913"
+
+      // When
+      val result = AddressIndexFileReader.extractDate(filePath)
+
+      // Then
+      result shouldBe expected
+    }
+
+    "extract date from ABP file path" in {
+      // Given
+      val filePath = "gs://aims-ons-exeter-e39-sample-1037392368223_backup/ABP_E39_blpu_v100316.csv"
+      val expected = "100316"
 
       // When
       val result = AddressIndexFileReader.extractDate(filePath)
