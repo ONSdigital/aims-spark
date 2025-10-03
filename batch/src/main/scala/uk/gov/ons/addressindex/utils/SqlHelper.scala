@@ -272,8 +272,8 @@ object SqlHelper {
         val outputPaf = paf.map(row => HybridAddressSkinnyEsDocument.rowToPaf(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
 
-        val lpiParentUprn: Option[Long] = outputLpis.headOption.flatMap(_.get("parentUprn").map(_.toString)).getOrElse("0").toLongOption
-        val parentUprn = Option(row.getAs[Long]("parentUprn")).getOrElse(lpiParentUprn)
+        val lpiParentUprn: Long = outputLpis.headOption.flatMap(_.get("parentUprn").map(_.toString)).getOrElse("0").toLong
+        val parentUprn = Option[Long](Option(row.getAs[Long]("parentUprn")).getOrElse(lpiParentUprn))
 
         val lpiPostCode: Option[String] = outputLpis.headOption.flatMap(_.get("postcodeLocator").map(_.toString))
         val pafPostCode: Option[String] = outputPaf.headOption.flatMap(_.get("postcode").map(_.toString))
@@ -397,8 +397,8 @@ object SqlHelper {
         val outputRelatives = relatives.map(row => HybridAddressEsDocument.rowToHierarchy(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
 
-        val lpiParentUprn: Option[Long] = outputLpis.headOption.flatMap(_.get("parentUprn").map(_.toString)).getOrElse("0").toLongOption
-        val parentUprn = Option(row.getAs[Long]("parentUprn")).getOrElse(lpiParentUprn)
+        val lpiParentUprn: Long = outputLpis.headOption.flatMap(_.get("parentUprn").map(_.toString)).getOrElse("0").toLong
+        val parentUprn = Option[Long](Option(row.getAs[Long]("parentUprn")).getOrElse(lpiParentUprn))
 
         val lpiPostCode: Option[String] = outputLpis.headOption.flatMap(_.get("postcodeLocator").map(_.toString))
         val pafPostCode: Option[String] = outputPaf.headOption.flatMap(_.get("postcode").map(_.toString))
