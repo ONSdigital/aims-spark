@@ -101,7 +101,7 @@ to the localDeps variable in the build.sbt file.
 * Apache Spark 3.5.1
 * Elasticsearch 8.14.3
 * Elasticsearch-spark-30 8.14.2
-* Versions compatible with Google Dataproc Serverless v2.2
+* Versions compatible with Google Dataproc Serverless v2.3
 
 ### Development Setup (IntelliJ)
 
@@ -121,7 +121,7 @@ From the root of the project
 sbt clean assembly
 ```
 
-The resulting jar will be located in `batch/target/scala-2.12/ons-ai-batch-assembly-version.jar`
+The resulting jar will be located in `batch/target/scala-2.13/ons-ai-batch-assembly-version.jar`
 
 To run the jar:
 
