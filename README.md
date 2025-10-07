@@ -20,7 +20,7 @@ The data used by ONS to build the Elasticsearch indices is produced as follows:
 Every 6 weeks we receive a set of AddressBase ‘Change Only Update’ (COU) files (the latest ‘Epoch’), which are applied to our previous existing AddressBase master tables to produce ‘full’ tables for the latest Epoch.
 We run a <a href="dbscripts/hierarchy_script.sql">script</a> against the updated AddressBase data to produce an additional Hierarchy table.
 
-The spark job will run without a real Hierarchy table (the dummy one in the unit tests will suffice) but the "relatives" information will be blank on every document. This won't affect the automated matching process, rather the structure of hierarchical addresses helps with clerical resolution.
+The spark job will run without a real Hierarchy table (the dummy one in the unit tests will suffice, though it will need to be sited with the rest of the input data) but the "relatives" information will be blank on every document. This won't affect the automated matching process, rather the structure of hierarchical addresses helps with clerical resolution.
 
 Note that the SQL used by ONS to create the Hierarchy table (link above) runs inside our Reference Data Management Framework (RDMF) system and not all the input fields are present in the standard ABP data: The address_entry_id and valid from / to dates are from the RDMF.
 
@@ -28,7 +28,34 @@ The job also has some additional input for the Integrated Data Service (IDS). Th
 
 Again the dummy file will suffice to allow the job to complete, with the AddressEntryId field left blank on all records.
 
-Note that the islands flag is set to true if the islands data is supplied via separate CSV files, false if the islands data has been amalgamated or if it is not present.
+The configuration file reference.conf contains various settings such as the locations of the input files, these can be edited or overridden by creating an application.conf file in the same directory (more about this in the Running section below).
+
+Example application.conf (files in GCS buckets as used by ONS):
+```
+addressindex.elasticsearch.nodes="10.210.0.13"
+addressindex.elasticsearch.port="9200"
+//
+//addressindex.elasticsearch.user="elastic"
+//addressindex.elasticsearch.pass="elastic"
+
+// comment out the next two lines for a local run or if using Serverless Dataproc
+// addressindex.spark.master="yarn"
+// addressindex.spark.sql.shuffle.partitions=50
+addressindex.spark.sql.broadcastTimeout="600s"
+addressindex.islands.used="false"
+
+addressindex.files.csv.blpu="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_blpu_current_20250912.csv"
+addressindex.files.csv.classification="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_classification_current_20250912.csv"
+addressindex.files.csv.crossref="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_crossref_current_20250912.csv"
+addressindex.files.csv.delivery-point="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_delivery_point_current_20250912.csv"
+addressindex.files.csv.hierarchy="gs://aims-ons-abp-raw-full-e119-179270555351/ABP_E811a_v111017.csv"
+addressindex.files.csv.lpi="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_lpi_current_20250912.csv"
+addressindex.files.csv.organisation="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_organisation_current_20250912.csv"
+addressindex.files.csv.street-descriptor="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_street_descriptor_current_20250912.csv"
+addressindex.files.csv.street="gs://aims-ons-abp-raw-full-e119-179270555351/ai_aims_street_current_20250912.csv"
+addressindex.files.csv.rdmf="gs://aims-ons-rdmf-e119-179270555351/*"
+```
+Note that the islands flag is set to true if the islands data is supplied via separate CSV files, false if the islands data has been amalgamated or if it is not present. This flag may be removed soon as we no longer get the islands data separately.
 
 The full indices are around 70GB in size and the skinny ones 40GB.
 
@@ -74,7 +101,7 @@ to the localDeps variable in the build.sbt file.
 * Apache Spark 3.5.1
 * Elasticsearch 8.14.3
 * Elasticsearch-spark-30 8.14.2
-* Versions compatible with Google Dataproc Serverless v2.2
+* Versions compatible with Google Dataproc Serverless v2.3
 
 ### Development Setup (IntelliJ)
 
@@ -94,12 +121,12 @@ From the root of the project
 sbt clean assembly
 ```
 
-The resulting jar will be located in `batch/target/scala-2.12/ons-ai-batch-assembly-version.jar`
+The resulting jar will be located in `batch/target/scala-2.13/ons-ai-batch-assembly-version.jar`
 
 To run the jar:
 
 ```shell
-java -Dconfig.file=application.conf -jar batch/target/scala-2.12/ons-ai-batch-assembly-version.jar
+java -Dconfig.file=application.conf -jar batch/target/scala-2.13/ons-ai-batch-assembly-version.jar
 ```
 The target Elasticsearch index can be on a local ES deployment or an external server (configurable)
 The `application.conf` file may contain:
