@@ -2,6 +2,8 @@ package uk.gov.ons.addressindex.readers
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class AddressIndexFileReaderSpec extends AnyWordSpec with Matchers {
 
@@ -362,14 +364,18 @@ class AddressIndexFileReaderSpec extends AnyWordSpec with Matchers {
       result shouldBe expected
     }
 
-    "throw exception if no date could be extracted" in {
+    "return today's date if no date could be extracted" in {
       // Given
       val filePath = "gs://aims-ons-abp-raw-full-e102-1037392368223_backup/ai_aims_delivery_point_current_star_wars.csv"
+      val currentDateTime: LocalDateTime = LocalDateTime.now()
+      val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+      val expected: String = currentDateTime.format(formatter)
 
-      // When Then
-      intercept[IllegalArgumentException]{
-        AddressIndexFileReader.extractDate(filePath)
-      }
+      // When
+      val result = AddressIndexFileReader.extractDate(filePath)
+
+      // Then
+      result shouldBe expected
     }
 
     "return true if file could be validated" ignore {
