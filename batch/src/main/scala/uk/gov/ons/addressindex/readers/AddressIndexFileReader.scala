@@ -6,6 +6,8 @@ import org.apache.spark.sql.types.StructType
 import uk.gov.ons.addressindex.models.CSVSchemas
 import uk.gov.ons.addressindex.utils.SparkProvider
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import scala.util.Try
 
 /**
@@ -194,7 +196,7 @@ object AddressIndexFileReader {
   private def resolveAbsolutePath(path: String) = {
     val currentDirectory = new java.io.File(".").getCanonicalPath
 
-    if (path.startsWith("hdfs://") || path.startsWith("gs://") ) path
+    if (path.startsWith("hdfs://") || path.startsWith("gs://") || path.startsWith("s3://") ) path
     else {
       if (System.getProperty("os.name").toLowerCase.startsWith("windows")) {
         s"$currentDirectory/$path"
@@ -225,18 +227,20 @@ object AddressIndexFileReader {
 
   }
 
+  // test is not currently enforced
   def validateFileName(filePath: String, epoch: Int, date: String): Boolean = {
   val nameRegex1 = s"ABP_E$epoch.+_v$date\\.csv$$".r
-  val nameRegex2 = s"ABP_E$epoch.+_v$date\\.csv\\.gz$$".r
+  val nameRegex2 = s"ai_aims.+_v$date\\.csv$$".r
+  val nameRegex3 = "^ID\\d{2}_[A-Za-z]+_Records.*".r
 
-    if (nameRegex1.findFirstIn(filePath).isDefined || nameRegex2.findFirstIn(filePath).isDefined) true
+    if (nameRegex1.findFirstIn(filePath).isDefined || nameRegex2.findFirstIn(filePath).isDefined || nameRegex3.findFirstIn(filePath).isDefined) true
     else
       true
       // throw new IllegalArgumentException(s"file $filePath does not contain epoch $epoch and date $date")
     }
 
   // this will remain hard coded unless the epoch number appears in the filename instead of "current"
-  // alernatively could use the epoch number from the rmdf lookup file
+  // alernatively could use the epoch number from the rmdf lookup file (not avaialable outside ONS)
   def extractEpoch(filePath: String): Int = {
 //    val epochRegex = s"ABP_E(\\d+).+$$".r
 //    val epoch = epochRegex.findFirstMatchIn(filePath).getOrElse(throw new IllegalArgumentException(s"file $filePath does not contain epoch number"))
@@ -244,6 +248,7 @@ object AddressIndexFileReader {
     119
   }
 
+  // try to pick the data file creation date from the filename else use current date
   def extractDate(filePath: String): String = {
     val dateRegex1 = s"ai_aims.+(\\d{8})\\.csv$$".r
     val dateRegex2 = s"ABP.+(\\d{6})\\.csv$$".r
@@ -251,7 +256,11 @@ object AddressIndexFileReader {
     val date2 = dateRegex2.findFirstMatchIn(filePath).getOrElse(null)
     if (date1 != null) date1.group(1)
     else if (date2 != null) date2.group(1)
-    else throw new IllegalArgumentException(s"file $filePath does not contain valid date")
+    else {
+      val currentDateTime: LocalDateTime = LocalDateTime.now()
+      val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+      currentDateTime.format(formatter)
+    }
   }
 
   def generateIndexNameFromFileName(historical : Boolean = true, skinny : Boolean = false): String = {
