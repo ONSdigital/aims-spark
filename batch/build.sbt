@@ -10,22 +10,22 @@ val localTarget: Boolean = false
 // reload all sbt projects to clear ivy cache
 
 val localDeps = Seq(
-  "org.apache.spark" %% "spark-core" % "3.5.1",
-  "org.apache.spark" %% "spark-sql" % "3.5.1",
-  "org.apache.spark" %% "spark-hive" % "3.5.1"
+  "org.apache.spark" %% "spark-core" % "4.0.0",
+  "org.apache.spark" %% "spark-sql" % "4.0.0",
+  "org.apache.spark" %% "spark-hive" % "4.0.0"
 )
 
 val clouderaDeps = Seq(
-  "org.apache.spark" %% "spark-core" % "3.5.1" % "provided",
-  "org.apache.spark" %% "spark-sql" % "3.5.1" % "provided",
-  "org.apache.spark" %% "spark-hive" % "3.5.1" % "provided",
+  "org.apache.spark" %% "spark-core" % "4.0.0" % "provided",
+  "org.apache.spark" %% "spark-sql" % "4.0.0" % "provided",
+  "org.apache.spark" %% "spark-hive" % "4.0.0" % "provided",
   "org.apache.httpcomponents" % "httpclient" % "4.5.14"
 )
 
 val otherDeps = Seq(
-  "com.typesafe" % "config" % "1.4.3",
+  "com.typesafe" % "config" % "1.4.5",
   "org.elasticsearch" %% "elasticsearch-spark-30" % "8.14.2" excludeAll ExclusionRule(organization = "javax.servlet"),
-  "org.rogach" %% "scallop" % "5.1.0",
+  "org.rogach" %% "scallop" % "6.0.0",
   "org.scalaj" %% "scalaj-http" % "2.4.2",
   "com.crealytics" %% "spark-excel" % "3.5.1_0.20.4",
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
@@ -40,6 +40,6 @@ else libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value
 ) ++ clouderaDeps ++ otherDeps
 
-dependencyOverrides += "commons-codec" % "commons-codec" % "1.15"
+dependencyOverrides += "commons-codec" % "commons-codec" % "1.20.0"
 
 scalacOptions ++= List("-unchecked", "-Xlint")
