@@ -95,13 +95,13 @@ to the localDeps variable in the build.sbt file.
 
 ### Software and Versions
 
-* Java 17
+* Java 17 (21 for Spark 4)
 * SBT 1.9.9
 * Scala 2.13.14
-* Apache Spark 3.5.1
+* Apache Spark 3.5.1 (or 4.0.0)
 * Elasticsearch 8.14.3
 * Elasticsearch-spark-30 8.14.2
-* Versions compatible with Google Dataproc Serverless v2.3
+* Versions compatible with Google Dataproc Serverless v2.3 (or 3.0)
 
 ### Development Setup (IntelliJ)
 
