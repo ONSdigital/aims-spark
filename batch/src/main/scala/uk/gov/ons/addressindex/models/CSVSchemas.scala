@@ -288,12 +288,12 @@ object CSVSchemas {
   ))
 
   /**
-    * RDMF address_entry_id to uprn lookup file schema
+    * RDMF address_entry_id to uprn lookup file schema. Epoch required for 119 or earlier
     */
   val rdmfFileSchema = StructType(Seq(
     StructField("uprn", LongType, nullable = false),
     StructField("address_entry_id", LongType, nullable = false),
-    StructField("epoch", LongType, nullable = false),
+ //   StructField("epoch", LongType, nullable = false),
     StructField("address_entry_id_alphanumeric_backup", StringType, nullable = false),
   ))
 
