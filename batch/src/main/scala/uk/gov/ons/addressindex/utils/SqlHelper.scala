@@ -271,7 +271,7 @@ object SqlHelper {
 
         val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
         val crossRefs = Option(row.getAs[Seq[Row]]("crossRefs")).getOrElse(Seq())
-        val outputCrossRefs = crossRefs.map(row => HybridAddressEsDocument.rowToCrossRef(row))
+        val outputCrossRefs = crossRefs.map(row => HybridAddressSkinnyEsDocument.rowToCrossRef(row))
         val outputLpis = lpis.map(row => HybridAddressSkinnyEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressSkinnyEsDocument.rowToPaf(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption

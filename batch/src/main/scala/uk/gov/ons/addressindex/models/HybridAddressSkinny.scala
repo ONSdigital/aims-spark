@@ -122,4 +122,9 @@ trait HybridAddressSkinny {
       row.getString(1).trim + " " + row.getString(1).replace(" ","")
     )
 
+  def rowToCrossRef(row: Row): Map[String, String] = Map(
+    "crossReference" -> row.getAs[String]("crossReference"),
+    "source" -> row.getAs[String]("source")
+  )
+
 }
