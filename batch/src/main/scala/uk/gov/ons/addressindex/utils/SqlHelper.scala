@@ -268,9 +268,8 @@ object SqlHelper {
         val uprn = row.getAs[Long]("uprn")
         val paf = Option(row.getAs[scala.collection.mutable.Seq[Row]]("paf")).getOrElse(Seq()).toSeq
         val lpis = Option(row.getAs[scala.collection.mutable.Seq[Row]]("lpis")).getOrElse(Seq()).toSeq
-
+        val crossRefs = Option(row.getAs[scala.collection.mutable.Seq[Row]]("crossRefs")).getOrElse(Seq()).toSeq
         val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
-        val crossRefs = Option(row.getAs[Seq[Row]]("crossRefs")).getOrElse(Seq())
         val outputCrossRefs = crossRefs.map(row => HybridAddressSkinnyEsDocument.rowToCrossRef(row))
         val outputLpis = lpis.map(row => HybridAddressSkinnyEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressSkinnyEsDocument.rowToPaf(row))
