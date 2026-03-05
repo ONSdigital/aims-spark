@@ -873,6 +873,16 @@ object Mappings {
                       "index": "true",
                       "analyzer": "keyword"
                   },
+                  "censusAddressType": {
+                       "type": "text",
+                       "index": "true",
+                       "analyzer": "keyword"
+                  },
+                  "censusEstabType": {
+                       "type": "text",
+                       "index": "true",
+                       "analyzer": "keyword"
+                  },
                   "fromSource": {
                       "type": "text",
                       "index": "true",
@@ -1503,6 +1513,16 @@ object Mappings {
                          "min_chars" : 1,
                          "max_chars" : 6
                       }
+                  },
+                  "censusAddressType": {
+                      "type": "text",
+                      "index": "true",
+                      "analyzer": "keyword"
+                  },
+                  "censusEstabType": {
+                      "type": "text",
+                      "index": "true",
+                      "analyzer": "keyword"
                   },
                   "fromSource": {
                       "type": "text",

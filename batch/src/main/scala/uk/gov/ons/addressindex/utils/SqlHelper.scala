@@ -268,11 +268,19 @@ object SqlHelper {
         val uprn = row.getAs[Long]("uprn")
         val paf = Option(row.getAs[scala.collection.mutable.Seq[Row]]("paf")).getOrElse(Seq()).toSeq
         val lpis = Option(row.getAs[scala.collection.mutable.Seq[Row]]("lpis")).getOrElse(Seq()).toSeq
-
+        val crossRefs = Option(row.getAs[scala.collection.mutable.Seq[Row]]("crossRefs")).getOrElse(Seq()).toSeq
         val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
+        val outputCrossRefs = crossRefs.map(row => HybridAddressSkinnyEsDocument.rowToCrossRef(row))
         val outputLpis = lpis.map(row => HybridAddressSkinnyEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressSkinnyEsDocument.rowToPaf(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
+
+        val addressType = Option(row.getAs[String]("addressType")).getOrElse("")
+        val estabType = Option(row.getAs[String]("estabType")).getOrElse("")
+        val isCouncilTax:Boolean = outputCrossRefs.mkString.contains("7666VC")
+        val isNonDomesticRate:Boolean = outputCrossRefs.mkString.contains("7666VN")
+        val censusAddressType = if (addressType.isEmpty) CensusClassificationHelper.ABPToAddressType(classificationCode.getOrElse(""), isCouncilTax, isNonDomesticRate) else addressType
+        val censusEstabType = if (estabType.isEmpty) CensusClassificationHelper.ABPToEstabType(classificationCode.getOrElse(""), isCouncilTax, isNonDomesticRate) else StringUtil.applyTitleCasing(estabType)
 
         val lpiParentUprn: Long = Try(outputLpis.headOption.flatMap(_.get("parentUprn").map(_.toString)).getOrElse("0").toLong).getOrElse(0L)
         val parentUprn: Long = Option(row.getAs[Long]("parentUprn")).getOrElse(lpiParentUprn)
@@ -332,6 +340,8 @@ object SqlHelper {
           outputLpis,
           outputPaf,
           classificationCode,
+          censusAddressType,
+          censusEstabType,
           postCode,
           fromSource,
           countryCode,
@@ -393,11 +403,19 @@ object SqlHelper {
         val relatives = Option(row.getAs[scala.collection.mutable.Seq[Row]]("relatives")).getOrElse(Seq()).toSeq
 
         val classifications = Option(row.getAs[scala.collection.mutable.Seq[Row]]("classification")).getOrElse(Seq()).toSeq
+
         val outputLpis = lpis.map(row => HybridAddressEsDocument.rowToLpi(row))
         val outputPaf = paf.map(row => HybridAddressEsDocument.rowToPaf(row))
         val outputCrossRefs = crossRefs.map(row => HybridAddressEsDocument.rowToCrossRef(row))
         val outputRelatives = relatives.map(row => HybridAddressEsDocument.rowToHierarchy(row))
         val classificationCode: Option[String] = classifications.map(row => row.getAs[String]("classificationCode")).headOption
+
+        val addressType = Option(row.getAs[String]("addressType")).getOrElse("")
+        val estabType = Option(row.getAs[String]("estabType")).getOrElse("")
+        val isCouncilTax:Boolean = outputCrossRefs.mkString.contains("7666VC")
+        val isNonDomesticRate:Boolean = outputCrossRefs.mkString.contains("7666VN")
+        val censusAddressType = if (addressType.isEmpty) CensusClassificationHelper.ABPToAddressType(classificationCode.getOrElse(""), isCouncilTax, isNonDomesticRate) else addressType
+        val censusEstabType = if (estabType.isEmpty) CensusClassificationHelper.ABPToEstabType(classificationCode.getOrElse(""), isCouncilTax, isNonDomesticRate) else StringUtil.applyTitleCasing(estabType)
 
         val lpiParentUprn: Long = Try(outputLpis.headOption.flatMap(_.get("parentUprn").map(_.toString)).getOrElse("0").toLong).getOrElse(0L)
         val parentUprn: Long = Option(row.getAs[Long]("parentUprn")).getOrElse(lpiParentUprn)
@@ -466,6 +484,8 @@ object SqlHelper {
           outputPaf,
           outputCrossRefs,
           classificationCode,
+          censusAddressType,
+          censusEstabType,
           postCode,
           fromSource,
           countryCode,
