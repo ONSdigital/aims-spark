@@ -1,5 +1,6 @@
 package uk.gov.ons.addressindex.utils
 
+import org.apache.spark.sql.Row
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.ons.addressindex.models.CSVSchemas
@@ -214,6 +215,73 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       secondLine.getLong(0) shouldBe 100010971565L // UPRN
       secondLine.getInt(13) shouldBe 9402538 // USRN
       secondLine.getString(32) shouldBe "LOCALITY XYZ" // LOCALITY
+    }
+
+    "apply the skinny postal classification filter using AddressBasePostalCode values" in {
+
+      val date = java.sql.Date.valueOf("2024-01-01")
+      val classificationScheme = "AddressBase Premium Classification Scheme"
+
+      val blpu = SparkProvider.sparkContext.createDataFrame(
+        SparkProvider.sparkContext.sparkContext.parallelize(Seq(
+          Row(21.toByte, "I", 1L, 1L, 1.toByte, null, null, null, 100.0F, 200.0F, 51.0F, -0.1F, 1.toByte, 100.toShort, "E", date, null, date, date, "D", "AA1 1AA", 0.toShort),
+          Row(21.toByte, "I", 1L, 2L, 1.toByte, null, null, null, 101.0F, 201.0F, 51.1F, -0.2F, 1.toByte, 100.toShort, "E", date, null, date, date, "C", "AA1 1AB", 0.toShort),
+          Row(21.toByte, "I", 1L, 3L, 1.toByte, null, null, null, 102.0F, 202.0F, 51.2F, -0.3F, 1.toByte, 100.toShort, "E", date, null, date, date, "L", "AA1 1AC", 0.toShort),
+          Row(21.toByte, "I", 1L, 4L, 1.toByte, null, null, null, 103.0F, 203.0F, 51.3F, -0.4F, 1.toByte, 100.toShort, "E", date, null, date, date, "N", "AA1 1AD", 0.toShort),
+          Row(21.toByte, "I", 1L, 5L, 1.toByte, null, null, null, 104.0F, 204.0F, 51.4F, -0.5F, 1.toByte, 100.toShort, "E", date, null, date, date, "N", "AA1 1AE", 0.toShort)
+        )),
+        CSVSchemas.blpuFileSchema
+      )
+
+      val classification = SparkProvider.sparkContext.createDataFrame(
+        SparkProvider.sparkContext.sparkContext.parallelize(Seq(
+          Row(24.toByte, "I", 1L, 1L, "class-1", "CC", classificationScheme, 1.0F, date, null, date, date),
+          Row(24.toByte, "I", 1L, 2L, "class-2", "CE", classificationScheme, 1.0F, date, null, date, date),
+          Row(24.toByte, "I", 1L, 3L, "class-3", "RD", classificationScheme, 1.0F, date, null, date, date),
+          Row(24.toByte, "I", 1L, 4L, "class-4", "RD", classificationScheme, 1.0F, date, null, date, date),
+          Row(24.toByte, "I", 1L, 5L, "class-5", "CC", classificationScheme, 1.0F, date, null, date, date)
+        )),
+        CSVSchemas.classificationFileSchema
+      )
+
+      val lpi = SparkProvider.sparkContext.createDataFrame(
+        SparkProvider.sparkContext.sparkContext.parallelize((1 to 5).map { uprn =>
+          Row(24.toByte, "I", 1L, uprn.toLong, s"LPI-$uprn", "ENG", 1.toByte, date, null, date, date, null, null, null, null, null, uprn.toShort, null, null, null, s"PAO $uprn", 1000 + uprn, 1.toByte, null, null, "Y")
+        }),
+        CSVSchemas.lpiFileSchema
+      )
+
+      val organisation = SparkProvider.sparkContext.createDataFrame(
+        SparkProvider.sparkContext.sparkContext.emptyRDD[Row],
+        CSVSchemas.organisationFileSchema
+      )
+
+      val street = SparkProvider.sparkContext.createDataFrame(
+        SparkProvider.sparkContext.sparkContext.parallelize((1 to 5).map { uprn =>
+          Row(15.toByte, "I", 1L, 1000 + uprn, 1.toByte, 1.toShort, null, null, null, 1.toByte, 1.toShort, date, null, date, date, 10.0F, 20.0F, 50.0F, -0.1F, 11.0F, 21.0F, 50.1F, -0.2F, 0.toShort)
+        }),
+        CSVSchemas.streetFileSchema
+      )
+
+      val streetDescriptor = SparkProvider.sparkContext.createDataFrame(
+        SparkProvider.sparkContext.sparkContext.parallelize((1 to 5).map { uprn =>
+          Row(11.toByte, "I", 1L, 1000 + uprn, s"Street $uprn", s"Locality $uprn", s"Town $uprn", "Admin", "ENG", date, null, date, date)
+        }),
+        CSVSchemas.streetDescriptorFileSchema
+      )
+
+      val historicalResult = SqlHelper.joinCsvs(blpu, classification, lpi, organisation, street, streetDescriptor, skinny = true)
+        .orderBy("uprn")
+        .collect()
+        .map(_.getAs[Long]("uprn"))
+
+      val nonHistoricalResult = SqlHelper.joinCsvs(blpu, classification, lpi, organisation, street, streetDescriptor, historical = false, skinny = true)
+        .orderBy("uprn")
+        .collect()
+        .map(_.getAs[Long]("uprn"))
+
+      historicalResult shouldBe Array(1L, 2L, 3L, 4L)
+      nonHistoricalResult shouldBe Array(1L, 2L, 3L, 4L)
     }
 
     "aggregate relatives from hierarchy table" in {

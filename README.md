@@ -64,7 +64,7 @@ The full indices are around 70GB in size and the skinny ones 40GB.
 There are four different indices that can be output:
 Full historic, Full non-historic, Skinny historic and Skinny non-historic, controlled by two input parameters to the Spark job (--skinny and --hybridNoHist).
 
-The skinny index was developed to speed up the typeahead function for the 2021 Census. As well as having fewer fields, it also excludes address types that are not residential, commercial or educational. Bulk matching is always done using the full data.
+The skinny index was developed to speed up the typeahead function for the 2021 Census. As well as having fewer fields, it applies an AddressBase Premium-specific filter: records with `ADDRESSBASE_POSTAL = N` are only kept when their classification code starts with `R` (residential). Postal records with `ADDRESSBASE_POSTAL = D`, `C`, or `L` are kept regardless of classification. Bulk matching is always done using the full data.
 
 As for historical entries, these are currently limited to those that ship with the latest Epoch. Our RDMF system has the ability to act as a "time machine" back to Epoch 39, but this is not currently implemented in AIMS.
 
