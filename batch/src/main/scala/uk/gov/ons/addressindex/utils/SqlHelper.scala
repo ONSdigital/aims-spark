@@ -12,6 +12,9 @@ import scala.util.Try
   */
 object SqlHelper {
 
+  // AddressBasePostalCode values include D/N/C/L; only N (not postal) is special-cased here.
+  private val skinnyPostalClassificationFilter = "NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')"
+
   def joinCsvs(blpu: DataFrame, classification: DataFrame, lpi: DataFrame, organisation: DataFrame, street: DataFrame,
                streetDescriptor: DataFrame, historical: Boolean = true, skinny: Boolean = false, custcodes: String = ""): DataFrame = {
     val classificationTable = SparkProvider.registerTempTable(classification, "classification")
@@ -25,7 +28,7 @@ object SqlHelper {
                 s"""SELECT b.*, c.classificationCode
                 FROM $blpuWithHistory b
                    LEFT JOIN $classificationTable c ON b.uprn = c.uprn
-                WHERE NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+                WHERE $skinnyPostalClassificationFilter""")
             else
               SparkProvider.sparkContext.sql(s"""SELECT b.* FROM $blpuWithHistory b """)
           SparkProvider.registerTempTable(blpuWithHistoryDF, "blpu")
@@ -37,7 +40,7 @@ object SqlHelper {
                 s"""SELECT b.*, c.classificationCode
                 FROM $blpuNoHistory b
                    LEFT JOIN $classificationTable c ON b.uprn = c.uprn
-                WHERE b.logicalStatus != 8 AND c.classificationCode !='DUMMY' AND NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+                WHERE b.logicalStatus != 8 AND c.classificationCode !='DUMMY' AND $skinnyPostalClassificationFilter""")
             else
               SparkProvider.sparkContext.sql(
                 s"""SELECT b.*, c.classificationCode
@@ -55,7 +58,7 @@ object SqlHelper {
                 s"""SELECT b.*, c.classificationCode
                 FROM $blpuWithHistory b
                    LEFT JOIN $classificationTable c ON b.uprn = c.uprn
-                WHERE b.localCustodianCode IN ($custcodes) AND NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+                WHERE b.localCustodianCode IN ($custcodes) AND $skinnyPostalClassificationFilter""")
             else {
               SparkProvider.sparkContext.sql(s"""SELECT b.* FROM $blpuWithHistory b WHERE b.localCustodianCode IN ($custcodes)""")
             }
@@ -68,7 +71,7 @@ object SqlHelper {
                 s"""SELECT b.*, c.classificationCode
                 FROM $blpuNoHistory b
                    LEFT JOIN $classificationTable c ON b.uprn = c.uprn
-                WHERE b.localCustodianCode IN ($custcodes) AND b.logicalStatus != 8 AND c.classificationCode !='DUMMY' AND NOT (b.addressBasePostal = 'N' AND NOT c.classificationCode LIKE 'R%')""")
+                WHERE b.localCustodianCode IN ($custcodes) AND b.logicalStatus != 8 AND c.classificationCode !='DUMMY' AND $skinnyPostalClassificationFilter""")
             else
               SparkProvider.sparkContext.sql(
                 s"""SELECT b.*, c.classificationCode
