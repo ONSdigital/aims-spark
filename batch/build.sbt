@@ -1,3 +1,5 @@
+scalaVersion := "2.13.14"
+
 resolvers ++= Seq(
   // allows us to include spark packages
   "spark-packages" at "https://repos.spark-packages.org/",
@@ -43,3 +45,16 @@ else libraryDependencies ++= Seq(
 dependencyOverrides += "commons-codec" % "commons-codec" % "1.20.0"
 
 scalacOptions ++= List("-unchecked", "-Xlint")
+
+Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+Test / fork := true
+Test / javaOptions ++= Seq(
+  "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
+  "--add-exports=java.base/sun.util.calendar=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+  "--add-opens=java.base/java.io=ALL-UNNAMED",
+  "--add-opens=java.base/java.nio=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+  "--add-opens=java.base/java.util=ALL-UNNAMED"
+)

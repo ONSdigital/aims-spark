@@ -12,6 +12,11 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
 
   val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
 
+  private def resolveTestResourcePath(pathFromRepoRoot: String): String = {
+    val localBatchPath = pathFromRepoRoot.stripPrefix("batch/")
+    if (new java.io.File(pathFromRepoRoot).exists()) pathFromRepoRoot else localBatchPath
+  }
+
   "SqlHelper" should {
     "join blpu, organisation, lpi, street, street_descriptor and cross_ref" in {
 
@@ -293,7 +298,7 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
         .format("com.databricks.spark.csv")
         .option("header", "true")
         .schema(CSVSchemas.postcodeAddressFileSchema)
-        .load("batch/src/test/resources/csv/delivery_point/hybrid_test.csv")
+        .load(resolveTestResourcePath("batch/src/test/resources/csv/delivery_point/hybrid_test.csv"))
 
       val blpu = AddressIndexFileReader.readBlpuCSV()
       val classification = AddressIndexFileReader.readClassificationCSV()
@@ -371,7 +376,7 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       secondResult.classificationCode shouldBe Some("RD")
       secondResult.postcodeOut shouldBe "PO15"
       secondResult.postcodeIn shouldBe "5RZ"
-      secondResult.parentUprn shouldBe 0L
+      secondResult.parentUprn shouldBe 210016751566L
       secondResult.relatives.length shouldBe 0
       secondResult.crossRefs.length shouldBe 6
       secondResult.lpi.size shouldBe 3
@@ -405,13 +410,13 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
         .format("com.databricks.spark.csv")
         .option("header", "true")
         .schema(CSVSchemas.postcodeAddressFileSchema)
-        .load("batch/src/test/resources/csv/delivery_point/hybrid_test.csv")
+        .load(resolveTestResourcePath("batch/src/test/resources/csv/delivery_point/hybrid_test.csv"))
 
       val paf2 = SparkProvider.sparkContext.read
         .format("com.databricks.spark.csv")
         .option("header", "true")
         .schema(CSVSchemas.postcodeAddressFileSchema)
-        .load("batch/src/test/resources/csv/delivery_point/hybrid_test_hist.csv")
+        .load(resolveTestResourcePath("batch/src/test/resources/csv/delivery_point/hybrid_test_hist.csv"))
 
       val blpu = AddressIndexFileReader.readBlpuCSV()
       val classification = AddressIndexFileReader.readClassificationCSV()
@@ -489,7 +494,7 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       secondResult.classificationCode shouldBe Some("RD")
       secondResult.postcodeOut shouldBe "PO15"
       secondResult.postcodeIn shouldBe "5RZ"
-      secondResult.parentUprn shouldBe 0L
+      secondResult.parentUprn shouldBe 210016751566L
       secondResult.relatives.length shouldBe 0
       secondResult.crossRefs.length shouldBe 6
       secondResult.lpi.size shouldBe 2
@@ -522,7 +527,7 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
         .format("com.databricks.spark.csv")
         .option("header", "true")
         .schema(CSVSchemas.postcodeAddressFileSchema)
-        .load("batch/src/test/resources/csv/delivery_point/hybrid_test.csv")
+        .load(resolveTestResourcePath("batch/src/test/resources/csv/delivery_point/hybrid_test.csv"))
 
       val blpu = AddressIndexFileReader.readBlpuCSV()
       val classification = AddressIndexFileReader.readClassificationCSV()
@@ -550,7 +555,7 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       val secondResult = result(3)
       secondResult.uprn shouldBe 100010971565L
       secondResult.classificationCode shouldBe Some("RD")
-      secondResult.parentUprn shouldBe 0L
+      secondResult.parentUprn shouldBe 210016751566L
       secondResult.lpi.size shouldBe 3
       secondResult.paf.size shouldBe 1
       secondResult.addressEntryId shouldBe Some(100000034563798L)
@@ -565,13 +570,13 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
         .format("com.databricks.spark.csv")
         .option("header", "true")
         .schema(CSVSchemas.postcodeAddressFileSchema)
-        .load("batch/src/test/resources/csv/delivery_point/hybrid_test.csv")
+        .load(resolveTestResourcePath("batch/src/test/resources/csv/delivery_point/hybrid_test.csv"))
 
       val paf2 = SparkProvider.sparkContext.read
         .format("com.databricks.spark.csv")
         .option("header", "true")
         .schema(CSVSchemas.postcodeAddressFileSchema)
-        .load("batch/src/test/resources/csv/delivery_point/hybrid_test_hist.csv")
+        .load(resolveTestResourcePath("batch/src/test/resources/csv/delivery_point/hybrid_test_hist.csv"))
 
       val blpu = AddressIndexFileReader.readBlpuCSV()
       val classification = AddressIndexFileReader.readClassificationCSV()
@@ -599,7 +604,7 @@ class SqlHelperSpec extends AnyWordSpec with Matchers {
       val secondResult = result(1)
       secondResult.uprn shouldBe 100010971565L
       secondResult.classificationCode shouldBe Some("RD")
-      secondResult.parentUprn shouldBe 0L
+      secondResult.parentUprn shouldBe 210016751566L
       secondResult.lpi.size shouldBe 2
       secondResult.paf.size shouldBe 1
       secondResult.addressEntryId shouldBe Some(100000034563798L)

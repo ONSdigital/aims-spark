@@ -210,6 +210,20 @@ The job can be run on serverless Dataproc by creating a batch similar to the exa
 
 ## Running Tests
 
+### Ubuntu/Linux
+
+On Ubuntu/Linux you do not need the Windows Hadoop/winutils setup.
+
+From the project root:
+
+```shell
+sbt test
+```
+
+If classloading issues are encountered, use the VM options listed below in IntelliJ run configurations. For sbt test runs, these JVM options are already configured in `batch/build.sbt` under `Test / javaOptions`.
+
+### Windows
+
 Before you can run tests on this project if using Windows you must
 
 * Install the 64-bit version of winutils.exe https://github.com/kontext-tech/winutils/tree/master/hadoop-3.3.1/bin

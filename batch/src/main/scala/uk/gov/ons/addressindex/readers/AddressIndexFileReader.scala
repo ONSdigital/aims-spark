@@ -6,6 +6,7 @@ import org.apache.spark.sql.types.StructType
 import uk.gov.ons.addressindex.models.CSVSchemas
 import uk.gov.ons.addressindex.utils.SparkProvider
 
+import java.nio.file.{Path, Paths}
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import scala.util.Try
@@ -198,12 +199,16 @@ object AddressIndexFileReader {
 
     if (path.startsWith("hdfs://") || path.startsWith("gs://") || path.startsWith("s3://") ) path
     else {
-      if (System.getProperty("os.name").toLowerCase.startsWith("windows")) {
-        s"$currentDirectory/$path"
-      }
-      else {
-        s"file://$currentDirectory/$path"
-      }
+      val currentPath = Paths.get(currentDirectory)
+      val normalizedRelativePath =
+        if (path.startsWith("batch/") && Option(currentPath.getFileName).exists(_.toString == "batch")) path.stripPrefix("batch/")
+        else path
+
+      val candidatePath = Paths.get(normalizedRelativePath)
+      val absolutePath = if (candidatePath.isAbsolute) candidatePath else currentPath.resolve(normalizedRelativePath)
+
+      if (System.getProperty("os.name").toLowerCase.startsWith("windows")) absolutePath.toString
+      else absolutePath.toUri.toString
     }
   }
 

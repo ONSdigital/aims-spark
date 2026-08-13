@@ -3,7 +3,8 @@ lazy val commonSettings = Seq(
   organization := "uk.gov.ons",
   scalaVersion := "2.13.14",
   // use 2.13.14 for serverless, 2.12.18 for servered Dataproc
-  assembly / test := {}
+  assembly / test := {},
+  Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 )
 
 lazy val buildSettings = Seq(
